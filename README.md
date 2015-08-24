@@ -11,3 +11,9 @@ brew cask install iterm2
 
 brew tap caskroom/versions
 brew cask install sublime-text3
+
+RUBY
+brew install ruby-build
+brew install rbenv
+rbenv install 2.1.2
+rbenv global 2.1.2
