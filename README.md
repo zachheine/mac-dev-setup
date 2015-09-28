@@ -8,6 +8,8 @@ THIRD - explicity install command line tools `xcode-select --install`
 
 FOURTH - install homebrew http://brew.sh
 
+FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
+
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
 `defaults write com.apple.finder AppleShowAllFiles -bool YES` #show dotfiles in finder
