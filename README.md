@@ -21,6 +21,8 @@ SEVENTH - install Creative Cloud desktop https://www.adobe.com/creativecloud/des
 
 EIGHTH - generate SSH key for Github https://help.github.com/articles/generating-ssh-keys/
 
+NINTH - install Dropbox `brew cask install dropbox`
+
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
 `defaults write com.apple.finder AppleShowAllFiles -bool YES` #show dotfiles in finder
