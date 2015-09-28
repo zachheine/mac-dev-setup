@@ -1,13 +1,16 @@
 # mac-dev-setup
 
 FIRST - clean install
+
 SECOND - start download of XCode
 
-sudo spctl --master-disable #allows app downloads from "Anywhere"
-defaults write com.apple.finder AppleShowAllFiles -bool YES #show dotfiles in finder
+THIRD - explicity install command line tools `xcode-select --install`
 
-COMMAND LINE TOOLS
-xcode-select --install
+FOURTH - install homebrew http://brew.sh
+
+`sudo spctl --master-disable` #allows app downloads from "Anywhere"
+
+`defaults write com.apple.finder AppleShowAllFiles -bool YES` #show dotfiles in finder
 
 QUICK LOOK PLUGINS
 brew cask install qlmarkdown
