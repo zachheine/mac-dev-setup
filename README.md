@@ -1,5 +1,8 @@
 # mac-dev-setup
 
+
+sudo spctl --master-disable #allows app downloads from "Anywhere"
+
 COMMAND LINE TOOLS
 xcode-select --install
 
