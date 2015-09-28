@@ -1,5 +1,7 @@
 # mac-dev-setup
 
+FIRST - clean install
+SECOND - start download of XCode
 
 sudo spctl --master-disable #allows app downloads from "Anywhere"
 
