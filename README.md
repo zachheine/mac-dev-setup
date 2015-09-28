@@ -4,6 +4,7 @@ FIRST - clean install
 SECOND - start download of XCode
 
 sudo spctl --master-disable #allows app downloads from "Anywhere"
+defaults write com.apple.finder AppleShowAllFiles -bool YES #show dotfiles in finder
 
 COMMAND LINE TOOLS
 xcode-select --install
