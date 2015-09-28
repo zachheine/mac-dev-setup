@@ -8,6 +8,9 @@ THIRD - explicity install command line tools `xcode-select --install`
 
 FOURTH - install homebrew http://brew.sh
 
+FOURTH-POINT-FIVE - install git `brew install git`
+FOURTH-POINT-FIVE(a) - install github desktop `brew cask install github-desktop`
+
 FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
 
 FIFTH(a) - install homebrew cask versions `brew tap caskroom/versions`
