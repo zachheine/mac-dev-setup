@@ -9,6 +9,9 @@ THIRD - explicity install command line tools `xcode-select --install`
 FOURTH - install homebrew http://brew.sh
 
 FOURTH-POINT-FIVE - install git `brew install git`
+`git config --global user.name "Zach Heineman"`
+`git config --global user.name "zach@heineman.info"`
+
 FOURTH-POINT-FIVE(a) - install github desktop `brew cask install github-desktop`
 
 FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
