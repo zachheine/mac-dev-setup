@@ -41,3 +41,6 @@ brew install ruby-build
 brew install rbenv
 rbenv install 2.1.2
 rbenv global 2.1.2
+
+MANAGE THE DOCK
+https://github.com/kcrawford/dockutil
