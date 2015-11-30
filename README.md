@@ -12,7 +12,10 @@ FOURTH-POINT-FIVE - install git `brew install git`
 `git config --global user.name "Zach Heineman"`
 `git config --global user.name "zach@heineman.info"`
 
-FOURTH-POINT-FIVE(a) - install github desktop `brew cask install github-desktop`
+FOURTH-POINT-FIVE(a) - clean up dock `brew install dockutil (https://github.com/kcrawford/dockutil)`
+dock plist location = ~/Library/Preferences/com.apple.dock.plist
+
+FOURTH-POINT-FIVE(b) - install github desktop `brew cask install github-desktop`
 
 FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
 
@@ -44,6 +47,3 @@ brew install ruby-build
 brew install rbenv
 rbenv install 2.1.2
 rbenv global 2.1.2
-
-MANAGE THE DOCK
-https://github.com/kcrawford/dockutil
