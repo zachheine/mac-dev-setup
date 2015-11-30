@@ -17,6 +17,8 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
 FOURTH-POINT-FIVE(b) - install github desktop `brew cask install github-desktop`
 
+`export HOMEBREW_CASK_OPTS="--appdir=/Applications"`
+
 FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
 
 FIFTH(a) - install homebrew cask versions `brew tap caskroom/versions`
