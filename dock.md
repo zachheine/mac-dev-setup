@@ -10,4 +10,5 @@ dockutil --remove 'iBooks'
 dockutil --remove 'App Store'
 
 dockutil --add /Applications/Xcode.app
-dockutil --add /Users/zrh0/Applications/Sublime\ Text.app
+dockutil --add /Applications/Sublime\ Text.app
+dockutil --add /Applications/GitHub\ Desktop.app
