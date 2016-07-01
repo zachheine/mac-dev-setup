@@ -1,6 +1,6 @@
 # mac-dev-setup
 
-FIRST - clean install
+FIRST - clean install `[sudo /Applications/Install\ OS\ X\ El\ Capitan.app/Contents/Resources/createinstallmedia --volume /Volumes/Untitled --applicationpath /Applications/Install\ OS\ X\ El\ Capitan.app --nointeraction]`
 
 SECOND - start download of XCode
 
