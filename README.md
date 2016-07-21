@@ -10,7 +10,7 @@ FOURTH - install homebrew http://brew.sh
 
 FOURTH-POINT-FIVE - install git `brew install git`
 `git config --global user.name "Zach Heineman"`
-`git config --global user.name "zach@heineman.info"`
+`git config --global user.email "zach@heineman.info"`
 
 FOURTH-POINT-FIVE(a) - clean up dock `brew install dockutil (https://github.com/kcrawford/dockutil)`
 dock plist location = ~/Library/Preferences/com.apple.dock.plist
