@@ -15,15 +15,13 @@ FOURTH-POINT-FIVE - install git `brew install git`
 FOURTH-POINT-FIVE(a) - clean up dock `brew install dockutil (https://github.com/kcrawford/dockutil)`
 dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
-FOURTH-POINT-FIVE(b) - install github desktop `brew cask install github-desktop`
+FIFTH - install homebrew cask `brew tap caskroom/cask`
 
 `export HOMEBREW_CASK_OPTS="--appdir=/Applications"`
 
-FIFTH - install homebrew cask `brew install caskroom/cask/brew-cask`
+FOURTH-POINT-FIVE(b) - install github desktop `brew cask install github-desktop`
 
-FIFTH(a) - install homebrew cask versions `brew tap caskroom/versions`
-
-SIXTH - install Sublime Text 3 `brew cask install sublime-text3`
+SIXTH - install Sublime Text 3 `brew cask install sublime-text`
 
 SEVENTH - install Creative Cloud desktop https://www.adobe.com/creativecloud/desktop-app.html
 
@@ -40,9 +38,7 @@ brew cask install qlmarkdown
 
 APPLICATIONS
 brew cask install iterm2
-
-brew tap caskroom/versions
-brew cask install sublime-text3
+brew cask install sublime-text
 
 RUBY
 brew install ruby-build
