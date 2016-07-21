@@ -31,7 +31,7 @@ NINTH - install Dropbox `brew cask install dropbox`
 
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
-`defaults write com.apple.finder AppleShowAllFiles -bool YES` #show dotfiles in finder
+`defaults write com.apple.finder AppleShowAllFiles -bool YES && killall Finder` #show dotfiles in finder
 
 QUICK LOOK PLUGINS
 brew cask install qlmarkdown
