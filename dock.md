@@ -11,4 +11,5 @@
 
 `dockutil --add /Applications/Xcode.app &&`
 `dockutil --add /Applications/Sublime\ Text.app &&`
-`dockutil --add /Applications/GitHub\ Desktop.app`
+`dockutil --add /Applications/GitHub\ Desktop.app &&`
+`dockutil --add /Applications/Google\ Chrome.app`
