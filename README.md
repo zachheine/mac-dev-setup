@@ -23,7 +23,7 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
 - install Creative Cloud desktop https://www.adobe.com/creativecloud/desktop-app.html
 
-- install microsoft Office https://www.microsoftstore.com/store/msusa/en_US/DisplayDownloadHistoryPage/
+- install microsoft Office https://www.microsoft.com/en-us/download/office.aspx
 
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
