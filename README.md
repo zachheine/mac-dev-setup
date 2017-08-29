@@ -15,7 +15,7 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
 - install homebrew cask `brew tap caskroom/cask`
 
-`export HOMEBREW_CASK_OPTS="--appdir=/Applications"`
+`export HOMEBREW_CASK_OPTS="--appdir=~/Applications --fontdir=/Library/Fonts"`
 
 - install github desktop `brew cask install github-desktop`
 - install Sublime Text 3 `brew cask install sublime-text`
