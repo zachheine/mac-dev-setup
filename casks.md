@@ -11,3 +11,5 @@ https://caskroom.github.io/search
 `brew cask install firefox`
 
 `brew cask install skype`
+
+`brew cask install transmit`
