@@ -9,9 +9,3 @@ https://github.com/creationix/nvm
 nvm install stable
 
 `npm install -g npm@latest`
-
-`npm install -g cordova`
-
-`npm install -g ionic`
-
-`npm install -g bower`
