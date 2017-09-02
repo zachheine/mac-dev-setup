@@ -13,3 +13,7 @@ https://caskroom.github.io/search
 `brew cask install skype`
 
 `brew cask install transmit`
+
+`brew cask install atom`
+
+`brew cask install caffeine`
