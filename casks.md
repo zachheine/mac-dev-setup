@@ -17,3 +17,5 @@ https://caskroom.github.io/search
 `brew cask install atom`
 
 `brew cask install caffeine`
+
+`brew cask install iterm2`
