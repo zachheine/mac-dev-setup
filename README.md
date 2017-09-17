@@ -10,6 +10,8 @@
 `git config --global user.name "Zach Heineman"`
 `git config --global user.email "zach@heineman.info"`
 
+https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
+
 - clean up dock `brew install dockutil (https://github.com/kcrawford/dockutil)`
 dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
