@@ -7,6 +7,9 @@
 `dockutil --remove 'FaceTime' &&`
 `dockutil --remove 'iTunes' &&`
 `dockutil --remove 'iBooks' &&`
+`dockutil --remove 'Pages' &&`
+`dockutil --remove 'Numbers' &&`
+`dockutil --remove 'Keynote' &&`
 `dockutil --remove 'App Store'`
 
 `dockutil --add /Applications/Xcode.app &&`
