@@ -10,6 +10,7 @@
 `dockutil --remove 'Pages' &&`
 `dockutil --remove 'Numbers' &&`
 `dockutil --remove 'Keynote' &&`
+`dockutil --remove 'Siri' &&`
 `dockutil --remove 'App Store'`
 
 `dockutil --add /Applications/Xcode.app &&`
