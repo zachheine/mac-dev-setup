@@ -20,6 +20,7 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 `export HOMEBREW_CASK_OPTS="--appdir=/Applications --fontdir=/Library/Fonts"`
 
 - install github desktop ~~`brew cask install github-desktop`~~ https://desktop.github.com
+- install Google Chrome `brew cask install google-chrome`
 - install Sublime Text 3 `brew cask install sublime-text`
 - install Dropbox `brew cask install dropbox`
 
