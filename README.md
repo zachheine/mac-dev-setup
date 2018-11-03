@@ -15,8 +15,6 @@ https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-s
 - clean up dock `brew install dockutil (https://github.com/kcrawford/dockutil)`
 dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
-- install homebrew cask `brew tap caskroom/cask`
-
 `export HOMEBREW_CASK_OPTS="--appdir=/Applications --fontdir=/Library/Fonts"`
 
 - install github desktop ~~`brew cask install github-desktop`~~ https://desktop.github.com
