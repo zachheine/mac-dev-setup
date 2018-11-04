@@ -7,7 +7,6 @@
 `dockutil --remove 'Reminders' &&`
 `dockutil --remove 'Maps' &&`
 `dockutil --remove 'Photos' &&`
-`dockutil --remove 'Messages' &&`
 `dockutil --remove 'FaceTime' &&`
 `dockutil --remove 'News' &&`
 `dockutil --remove 'iTunes' &&`
