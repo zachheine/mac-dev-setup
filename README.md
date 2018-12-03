@@ -6,6 +6,8 @@
 
 - install homebrew http://brew.sh
 
+`git clone https://github.com/zachheine/mac-dev-setup.git`
+
 - install git `brew install git`
 `git config --global user.name "Zach Heineman"`
 `git config --global user.email "zach@heineman.info"`
