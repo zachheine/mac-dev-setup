@@ -13,9 +13,10 @@ dockutil --remove 'Podcasts'
 dockutil --remove 'TV'
 dockutil --remove 'News'
 dockutil --remove 'App Store'
-# dockutil --add /Applications/Xcode.app
-# dockutil --add /Applications/Sublime\ Text.app
-# dockutil --add /Applications/GitHub\ Desktop.app
-# dockutil --add /Applications/Google\ Chrome.app
-# dockutil --add /Applications/Utilities/Terminal.app
-# dockutil --add /Applications/Adobe\ Photoshop\ CC\ 2019/Adobe\ Photoshop\ CC\ 2019.app
+
+dockutil --add /Applications/Google\ Chrome.app
+dockutil --add /Applications/Visual\ Studio\ Code.app
+dockutil --add /Applications/Adobe\ Photoshop\ 2020/Adobe\ Photoshop\ 2020.app
+dockutil --add /Applications/Adobe\ Illustrator\ 2020/Adobe\ Illustrator.app
+dockutil --add /System/Applications/Utilities/Terminal.app
+dockutil --add /Applications/Xcode.app
