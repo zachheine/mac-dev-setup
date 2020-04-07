@@ -4,6 +4,8 @@ http://stackoverflow.com/questions/28017374/what-is-the-suggested-way-to-install
 
 https://github.com/creationix/nvm
 
-nvm install node
+`nvm install node`
 
-brew install yarn --without-node
+`brew install yarn --without-node`
+
+`npm list -g --depth 0`
