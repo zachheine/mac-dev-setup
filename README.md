@@ -9,8 +9,12 @@
 `git clone https://github.com/zachheine/mac-dev-setup.git`
 
 - install git `brew install git`
+
 `git config --global user.name "Zach Heineman"`
+
 `git config --global user.email "zach@heineman.info"`
+
+Add `Developer` folder
 
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
