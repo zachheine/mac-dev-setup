@@ -14,7 +14,7 @@
 
 `git config --global user.email "zach@heineman.info"`
 
-Add `Developer` folder
+Add `Developer` folder: `mkdir ~/Developer`
 
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
