@@ -30,6 +30,7 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 - install Creative Cloud: `brew install adobe-creative-cloud` https://www.adobe.com/creativecloud/desktop-app.html
 - install Microsoft Office: https://account.microsoft.com/services/office/install (don't forget to customize!)
 - install Miro: `brew install miro` https://miro.com
+- install Zoom: `brew install zoom` https://zoom.com
 
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
