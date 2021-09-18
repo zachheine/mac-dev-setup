@@ -26,9 +26,8 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 - install github desktop: `brew install github` https://desktop.github.com
 - install Google Chrome: `brew install google-chrome` https://www.google.com/chrome/
 - install Visual Studio Code: `brew install visual-studio-code` https://code.visualstudio.com
-- install Dropbox `brew cask install dropbox`
-
-- install Creative Cloud desktop https://www.adobe.com/creativecloud/desktop-app.html
+- install Dropbox `brew install dropbox` https://www.dropbox.com/
+- install Creative Cloud: `brew install adobe-creative-cloud` https://www.adobe.com/creativecloud/desktop-app.html
 
 - install microsoft Office https://account.microsoft.com/services/office/install
 
