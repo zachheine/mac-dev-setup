@@ -14,7 +14,7 @@
 
 `git config --global user.email "zach@heineman.info"`
 
-Add `Developer` folder
+Add `Developer` folder: `mkdir ~/Developer`
 
 https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
@@ -23,9 +23,9 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 
 `export HOMEBREW_CASK_OPTS="--appdir=/Applications --fontdir=/Library/Fonts"`
 
-- install github desktop ~~`brew cask install github-desktop`~~ https://desktop.github.com
-- install Google Chrome `brew cask install google-chrome`
-- install Sublime Text 3 `brew cask install sublime-text`
+- install github desktop: `brew install github` https://desktop.github.com
+- install Google Chrome: `brew install google-chrome` https://www.google.com/chrome/
+- install Visual Studio Code: `brew install visual-studio-code` https://code.visualstudio.com
 - install Dropbox `brew cask install dropbox`
 
 - install Creative Cloud desktop https://www.adobe.com/creativecloud/desktop-app.html
