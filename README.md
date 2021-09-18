@@ -28,8 +28,8 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 - install Visual Studio Code: `brew install visual-studio-code` https://code.visualstudio.com
 - install Dropbox `brew install dropbox` https://www.dropbox.com/
 - install Creative Cloud: `brew install adobe-creative-cloud` https://www.adobe.com/creativecloud/desktop-app.html
-
-- install microsoft Office https://account.microsoft.com/services/office/install
+- install Microsoft Office: https://account.microsoft.com/services/office/install (don't forget to customize!)
+- install Miro: `brew install miro` https://miro.com
 
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
