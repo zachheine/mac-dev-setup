@@ -32,8 +32,8 @@ dock plist location = ~/Library/Preferences/com.apple.dock.plist
 - install Microsoft Office: https://account.microsoft.com/services/office/install (don't forget to customize!)
 - install Miro: `brew install miro` https://miro.com
 - install Zoom: `brew install zoom` https://zoom.com
-- install BackgroundMusic: `https://github.com/kyleneideck/BackgroundMusic`
-- install SwiftBarr: `[https://github.com/kyleneideck/BackgroundMusic](https://github.com/swiftbar/SwiftBar)`
+- install BackgroundMusic: `brew install --cask background-music` https://github.com/kyleneideck/BackgroundMusic
+- install SwiftBar: `brew install swiftbar` https://github.com/swiftbar/SwiftBar
 
 `sudo spctl --master-disable` #allows app downloads from "Anywhere"
 
