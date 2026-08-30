@@ -1,0 +1,329 @@
+#!/bin/sh
+# sweep — find every git repo that holds work existing nowhere else.
+#
+# Read-only. Never commits, pushes, creates repos, or modifies a working tree.
+# Reads paths of at-risk files but never their contents.
+#
+# Usage: bin/sweep [options]
+#   --root DIR      where to search            (default: $HOME)
+#   --out DIR       where to write the report  (default: $HOME/fleet-out/sweep)
+#   --exclude PAT   prune dirs named PAT       (repeatable)
+#   --jobs N        parallel remote checks     (default: 8)
+#   --quick         skip network + large-file checks
+#   --no-network    skip remote reachability checks only
+#   -h, --help      this message
+
+set -u
+
+ROOT="$HOME"
+OUT="$HOME/fleet-out/sweep"
+JOBS=8
+DO_NETWORK=1
+DO_LARGE=1
+EXTRA_PRUNE=""
+
+# Dirs pruned everywhere. Deliberately does NOT include Dropbox: people do keep
+# repos there, and missing one is worse than a slow scan. Use --exclude to skip.
+PRUNE_NAMES="node_modules .Trash .cache .npm .bundle .cocoapods Pods .venv venv \
+__pycache__ DerivedData .gradle .terraform vendor"
+
+# Paths pruned only at the top level of --root.
+PRUNE_PATHS="Library Applications OrbStack .orbstack Parallels .homebrew .nvm \
+.rbenv .pyenv .rustup .cargo go/pkg .Trash"
+
+# Files that vanish with the disk because git cannot see them.
+RISK_PATTERNS=".env .env.* *.pem *.p12 *.keystore *.mobileprovision \
+credentials credentials.* secrets secrets.* .netrc .npmrc *.sqlite *.sqlite3"
+
+LARGE_MB=95   # GitHub rejects blobs over 100MB
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --root)    ROOT="$2"; shift 2 ;;
+    --out)     OUT="$2"; shift 2 ;;
+    --jobs)    JOBS="$2"; shift 2 ;;
+    --exclude) EXTRA_PRUNE="$EXTRA_PRUNE $2"; shift 2 ;;
+    --quick)   DO_NETWORK=0; DO_LARGE=0; shift ;;
+    --no-network) DO_NETWORK=0; shift ;;
+    -h|--help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "sweep: unknown option $1" >&2; exit 2 ;;
+  esac
+done
+
+command -v git >/dev/null 2>&1 || { echo "sweep: git not found" >&2; exit 1; }
+
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/sweep.XXXXXX") || exit 1
+trap 'rm -rf "$TMP"' EXIT INT TERM
+mkdir -p "$TMP/reach" "$TMP/repos" "$OUT"
+
+# Never let git block on a credential or host-key prompt.
+GIT_TERMINAL_PROMPT=0; export GIT_TERMINAL_PROMPT
+GIT_SSH_COMMAND="ssh -oBatchMode=yes -oConnectTimeout=8 -oStrictHostKeyChecking=accept-new"
+export GIT_SSH_COMMAND
+
+# ---------- json helpers ----------
+
+json_escape() {
+  sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/	/\\t/g' -e 's/\r/\\r/g' \
+      -e 's/[[:cntrl:]]//g'
+}
+
+json_str() { printf '"%s"' "$(printf '%s' "$1" | json_escape)"; }
+
+# stdin: one item per line -> JSON array on stdout
+json_arr() {
+  printf '['
+  _first=1
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    [ -z "$_l" ] && continue
+    if [ "$_first" -eq 1 ]; then _first=0; else printf ','; fi
+    printf '"%s"' "$(printf '%s' "$_l" | json_escape)"
+  done
+  printf ']'
+}
+
+count_lines() { [ -s "$1" ] && wc -l < "$1" | tr -d ' ' || echo 0; }
+
+# ---------- discovery ----------
+
+build_find_prunes() {
+  for n in $PRUNE_NAMES $EXTRA_PRUNE; do printf -- '-name %s -o ' "$n"; done
+  for p in $PRUNE_PATHS; do printf -- '-path %s/%s -o ' "$ROOT" "$p"; done
+  printf -- '-false'
+}
+
+printf 'sweep: scanning %s ...\n' "$ROOT" >&2
+
+# shellcheck disable=SC2046
+find "$ROOT" \( $(build_find_prunes) \) -prune -o -name .git -print 2>/dev/null \
+  | sed 's#/\.git$##' | sort -u > "$TMP/repos.txt"
+
+NREPOS=$(count_lines "$TMP/repos.txt")
+printf 'sweep: found %s repositories\n' "$NREPOS" >&2
+
+# ---------- remote reachability (deduped, parallel) ----------
+
+url_key() { printf '%s' "$1" | cksum | cut -d' ' -f1; }
+
+if [ "$DO_NETWORK" -eq 1 ] && [ "$NREPOS" -gt 0 ]; then
+  while IFS= read -r r; do
+    git -C "$r" remote -v 2>/dev/null | awk '$3=="(fetch)"{print $2}'
+  done < "$TMP/repos.txt" | sort -u > "$TMP/urls.txt"
+
+  NURLS=$(count_lines "$TMP/urls.txt")
+  printf 'sweep: checking %s remote URLs (up to %s at a time) ...\n' "$NURLS" "$JOBS" >&2
+
+  n=0
+  while IFS= read -r url; do
+    [ -z "$url" ] && continue
+    (
+      if git ls-remote "$url" >/dev/null 2>&1; then echo ok; else echo fail; fi
+    ) > "$TMP/reach/$(url_key "$url")" &
+    n=$((n + 1))
+    if [ $((n % JOBS)) -eq 0 ]; then wait; fi
+  done < "$TMP/urls.txt"
+  wait
+fi
+
+remote_state() {
+  [ "$DO_NETWORK" -eq 1 ] || { echo unchecked; return; }
+  f="$TMP/reach/$(url_key "$1")"
+  [ -f "$f" ] && cat "$f" || echo unchecked
+}
+
+# ---------- per-repo inspection ----------
+
+: > "$TMP/rows.txt"
+idx=0
+
+while IFS= read -r r; do
+  [ -d "$r" ] || continue
+  idx=$((idx + 1))
+  printf '\rsweep: inspecting %s/%s' "$idx" "$NREPOS" >&2
+
+  d="$TMP/repos/$idx"; mkdir -p "$d"
+
+  git -C "$r" status --porcelain --untracked-files=no 2>/dev/null > "$d/uncommitted"
+  git -C "$r" ls-files --others --exclude-standard 2>/dev/null > "$d/untracked"
+  git -C "$r" stash list 2>/dev/null > "$d/stashes"
+  git -C "$r" log --branches --not --remotes --oneline 2>/dev/null > "$d/unpushed"
+
+  # local branches with no configured upstream
+  git -C "$r" for-each-ref --format='%(refname:short) %(upstream)' refs/heads 2>/dev/null \
+    | awk 'NF==1{print $1}' > "$d/no_upstream"
+
+  git -C "$r" remote -v 2>/dev/null | awk '$3=="(fetch)"{print $1" "$2}' > "$d/remotes_raw"
+  NREMOTES=$(count_lines "$d/remotes_raw")
+
+  HAS_COMMITS=0
+  git -C "$r" rev-parse --verify HEAD >/dev/null 2>&1 && HAS_COMMITS=1
+
+  BRANCH=$(git -C "$r" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')
+  LASTCOMMIT=''
+  [ "$HAS_COMMITS" -eq 1 ] && \
+    LASTCOMMIT=$(git -C "$r" log -1 --format=%ci 2>/dev/null | cut -d' ' -f1)
+
+  # files git cannot see that you would miss
+  : > "$d/at_risk"
+  for pat in $RISK_PATTERNS; do
+    find "$r" \( -name node_modules -o -name .git -o -name Pods -o -name .venv \) -prune \
+      -o -type f -name "$pat" -print 2>/dev/null
+  done | sort -u | while IFS= read -r f; do
+    git -C "$r" ls-files --error-unmatch "$f" >/dev/null 2>&1 || printf '%s\n' "$f"
+  done > "$d/at_risk"
+
+  # blobs that would make a push fail outright
+  : > "$d/large"
+  if [ "$DO_LARGE" -eq 1 ]; then
+    find "$r" -path "$r/.git" -prune -o -type f -size +${LARGE_MB}M -print 2>/dev/null \
+      | while IFS= read -r f; do
+          git -C "$r" check-ignore -q "$f" 2>/dev/null || printf '%s\n' "$f"
+        done > "$d/large"
+  fi
+
+  # ---- score: how much of this exists nowhere else? ----
+  SCORE=0; FLAGS=''
+  add() { SCORE=$((SCORE + $1)); FLAGS="$FLAGS $2"; }
+
+  if [ "$NREMOTES" -eq 0 ]; then
+    [ "$HAS_COMMITS" -eq 1 ] && add 50 no-remote || add 5 empty-no-remote
+  else
+    UNREACHABLE=0
+    while IFS= read -r line; do
+      u=$(printf '%s' "$line" | cut -d' ' -f2)
+      [ "$(remote_state "$u")" = fail ] && UNREACHABLE=1
+    done < "$d/remotes_raw"
+    [ "$UNREACHABLE" -eq 1 ] && add 45 remote-unreachable
+  fi
+
+  [ -s "$d/unpushed" ]     && add 40 unpushed
+  [ -s "$d/stashes" ]      && add 30 stashes
+  [ -s "$d/uncommitted" ]  && add 25 uncommitted
+  [ -s "$d/at_risk" ]      && add 20 at-risk-files
+  [ -s "$d/no_upstream" ]  && add 15 no-upstream
+  [ -s "$d/large" ]        && add 10 large-files
+  [ -s "$d/untracked" ]    && add 8  untracked
+
+  if   [ "$SCORE" -ge 40 ]; then SEV=critical
+  elif [ "$SCORE" -ge 20 ]; then SEV=high
+  elif [ "$SCORE" -ge 8  ]; then SEV=medium
+  elif [ "$SCORE" -gt 0  ]; then SEV=low
+  else SEV=clean
+  fi
+
+  printf '%06d\t%s\t%s\t%s\t%s\n' "$SCORE" "$SEV" "$idx" "$r" "${FLAGS# }" >> "$TMP/rows.txt"
+
+  { printf '{'
+    printf '"path":%s,'        "$(json_str "$r")"
+    printf '"score":%s,'       "$SCORE"
+    printf '"severity":%s,'    "$(json_str "$SEV")"
+    printf '"branch":%s,'      "$(json_str "$BRANCH")"
+    printf '"last_commit":%s,' "$(json_str "$LASTCOMMIT")"
+    printf '"has_commits":%s,' "$([ "$HAS_COMMITS" -eq 1 ] && echo true || echo false)"
+    printf '"flags":%s,'       "$(printf '%s' "${FLAGS# }" | tr ' ' '\n' | json_arr)"
+    printf '"remotes":['
+    _f=1
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      nm=$(printf '%s' "$line" | cut -d' ' -f1)
+      u=$(printf  '%s' "$line" | cut -d' ' -f2)
+      [ "$_f" -eq 1 ] && _f=0 || printf ','
+      printf '{"name":%s,"url":%s,"state":%s}' \
+        "$(json_str "$nm")" "$(json_str "$u")" "$(json_str "$(remote_state "$u")")"
+    done < "$d/remotes_raw"
+    printf '],'
+    printf '"uncommitted":%s,' "$(json_arr < "$d/uncommitted")"
+    printf '"untracked":%s,'   "$(json_arr < "$d/untracked")"
+    printf '"stashes":%s,'     "$(json_arr < "$d/stashes")"
+    printf '"unpushed":%s,'    "$(json_arr < "$d/unpushed")"
+    printf '"no_upstream":%s,' "$(json_arr < "$d/no_upstream")"
+    printf '"at_risk_files":%s,' "$(json_arr < "$d/at_risk")"
+    printf '"large_files":%s'  "$(json_arr < "$d/large")"
+    printf '}\n'
+  } > "$d/json"
+
+done < "$TMP/repos.txt"
+printf '\r\033[K' >&2
+
+# ---------- report ----------
+
+sort -r "$TMP/rows.txt" > "$TMP/sorted.txt"
+
+sev_count() { awk -F'\t' -v s="$1" '$2==s' "$TMP/sorted.txt" | wc -l | tr -d ' '; }
+
+REPORT="$OUT/sweep-report.txt"
+{
+  echo "git sweep — $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "host: $(hostname 2>/dev/null)   root: $ROOT"
+  [ "$DO_NETWORK" -eq 0 ] && echo "NOTE: remote reachability NOT checked (--no-network/--quick)"
+  echo
+  echo "repositories scanned : $NREPOS"
+  echo "  critical           : $(sev_count critical)   work that exists nowhere else"
+  echo "  high               : $(sev_count high)"
+  echo "  medium             : $(sev_count medium)"
+  echo "  low                : $(sev_count low)"
+  echo "  clean              : $(sev_count clean)"
+  echo
+  echo "Read top-down and stop when it goes quiet. Nothing here has been modified."
+  echo "======================================================================"
+
+  while IFS="$(printf '\t')" read -r _score sev i r flags; do
+    [ "$sev" = clean ] && continue
+    d="$TMP/repos/$i"
+    echo
+    echo "[$sev] $r"
+    echo "  flags: $flags"
+    show() {
+      [ -s "$2" ] || return 0
+      echo "  $1:"
+      head -n 20 "$2" | sed 's/^/    /'
+      _n=$(count_lines "$2")
+      [ "$_n" -gt 20 ] && echo "    ... and $((_n - 20)) more"
+    }
+    if [ -s "$d/remotes_raw" ]; then
+      echo "  remotes:"
+      while IFS= read -r line; do
+        u=$(printf '%s' "$line" | cut -d' ' -f2)
+        printf '    %s  [%s]\n' "$line" "$(remote_state "$u")"
+      done < "$d/remotes_raw"
+    else
+      echo "  remotes:  (none — this repo has never been pushed anywhere)"
+    fi
+    show "unpushed commits"        "$d/unpushed"
+    show "stashes"                 "$d/stashes"
+    show "uncommitted"             "$d/uncommitted"
+    show "branches with no upstream" "$d/no_upstream"
+    show "at-risk files (git cannot see these)" "$d/at_risk"
+    show "files too large to push"  "$d/large"
+    show "untracked"               "$d/untracked"
+  done < "$TMP/sorted.txt"
+
+  echo
+  echo "======================================================================"
+  echo "clean repositories ($(sev_count clean)):"
+  awk -F'\t' '$2=="clean"{print "  " $4}' "$TMP/sorted.txt"
+} > "$REPORT"
+
+JSONOUT="$OUT/sweep.json"
+{
+  printf '{"schema":1,'
+  printf '"generated_at":%s,' "$(json_str "$(date -u '+%Y-%m-%dT%H:%M:%SZ')")"
+  printf '"host":%s,'         "$(json_str "$(hostname 2>/dev/null)")"
+  printf '"root":%s,'         "$(json_str "$ROOT")"
+  printf '"network_checked":%s,' "$([ "$DO_NETWORK" -eq 1 ] && echo true || echo false)"
+  printf '"repo_count":%s,'   "${NREPOS:-0}"
+  printf '"repos":['
+  _f=1
+  while IFS="$(printf '\t')" read -r _s _sev i _r _fl; do
+    [ -f "$TMP/repos/$i/json" ] || continue
+    [ "$_f" -eq 1 ] && _f=0 || printf ','
+    tr -d '\n' < "$TMP/repos/$i/json"
+  done < "$TMP/sorted.txt"
+  printf ']}\n'
+} > "$JSONOUT"
+
+printf 'sweep: %s repos — %s critical, %s high, %s medium, %s low, %s clean\n' \
+  "$NREPOS" "$(sev_count critical)" "$(sev_count high)" "$(sev_count medium)" \
+  "$(sev_count low)" "$(sev_count clean)" >&2
+printf 'sweep: report  %s\n' "$REPORT" >&2
+printf 'sweep: json    %s\n' "$JSONOUT" >&2
